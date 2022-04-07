@@ -13,14 +13,19 @@ int main(int argc, char *argv[])
 
     PrintJobs(3, 6, jobs);
 
+    int Q[10][9] = {{1, 2, 3, 1, 2, 3, 1, 2, -1},
+                    {1, 2, 3, 1, 2, 3, 1, 2, -1},
+                    {1, 2, 3, 1, 2, 3, 1, 2, -1},
+                    {1, 2, 3, 1, 2, 3, 1, 2, -1},
+                    {1, 2, 3, 1, 2, 3, 1, 2, -1},
+                    {1, 2, 3, 1, 2, 3, 1, 2, -1}};
+
     return 1;
 }
 
-// Meter os jobs em arrays
-
 // job0 (m0,3) m(1,2) m(2,2)
 // job1 m(0,2) m(2,1) m(1,4)
-// job2 m(1,4) m(2,3)  -
+// job2 m(1,4) m(2,3)  -----
 
 // Escreve os jobs na consola
 //  Job 0: m0 t3	m1 t2	m2 t2
@@ -37,3 +42,27 @@ void PrintJobs(int jobCount, int mCount, int jobs[jobCount][mCount])
         printf("\n");
     }
 }
+
+// Pior solução
+// Meter em matriz Job x Operação
+// 3 arrays, um com duração, um com a maquina, e um de output com o instante de tempo de inicio
+// Atribuir sequencialmente na diagonal do array o inicio de cada operação
+//  Job 0: m0 t3	m1 t2	m2 t2
+//  Job 1: m0 t2	m2 t1	m1 t4
+//  Job 2: m1 t4	m2 t3	m-1 t-1
+//
+//          O1  O2  O3
+//  Job 1   0   3   5
+//  Job 2   7   9   10
+//  Job 3   14  18  21 -->22
+//
+// Contador tempo
+//
+// Heuristica local
+// Local heuristic neighborhood search
+//
+// Cada thread fazer a atribuição de cada job
+//
+// Matriz de ocupação da maquina para controlar o acesso á maquina
+// Ou variável global para cada máquina
+//
