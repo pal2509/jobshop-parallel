@@ -66,3 +66,9 @@ void PrintJobs(int jobCount, int mCount, int jobs[jobCount][mCount])
 // Matriz de ocupação da maquina para controlar o acesso á maquina
 // Ou variável global para cada máquina
 //
+// Solução otima matemática
+// Branch and bound para jobshop
+// Cresce exponencialmente
+//
+//
+//
