@@ -7,22 +7,27 @@ int main(int argc, char *argv[])
 
     int min = 0;
 
+    // Matriz para o tempo de cada job em cada maquina
     int jobTime[3][3] = {
         {3, 2, 2},
         {2, 1, 4},
         {4, 3, 1},
     };
 
+    // Matriz para o numero de cada maquina de cada operação
     int jobM[3][3] = {
         {0, 3, 2},
         {0, 2, 1},
         {1, 2, 3},
     };
 
+    // Matriz para o tempo de inicio de cada operação ---> Solução
     int jobSolution[3][3];
 
+    // Contador dos instantes de tempo
     int time = 0;
 
+    // Calculo dos tempos de inicio
     for (int y = 0; y < 3; y++)
     {
         for (int x = 0; x < 3; x++)
@@ -32,6 +37,7 @@ int main(int argc, char *argv[])
         }
     }
 
+    // Escrita do resultado na consola
     PrintJobs(3, 3, jobSolution, time);
 
     return 1;
