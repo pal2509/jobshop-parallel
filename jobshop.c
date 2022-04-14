@@ -1,44 +1,64 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+#define MAX 100
+
+int maxJobs = 0;
+int maxMan = 0;
+
+// Matriz para o tempo de cada job em cada maquina
+int jobTime[MAX][MAX];
+
+// Matriz para o numero de cada maquina de cada operação
+int jobM[MAX][MAX];
+
+// Matriz para o tempo de inicio de cada operação ---> Solução
+int jobSolution[MAX][MAX];
 
 void PrintJobs(int y, int x, int jobSolution[y][x], int totalTime);
+void ReadFile(char *fileName);
 
 int main(int argc, char *argv[])
 {
 
+    FILE *fpOutput;
+    char *fileNameI;
+    char *fileNameO;
+
+    if (argc < 1)
+        printf("Insira argumentos.\n");
+    else
+    {
+        printf("%s\n", argv[1]);
+        printf("%s\n", argv[2]);
+
+        fileNameI = (char *)malloc(strlen(argv[1]) + 1);
+        strcpy(fileNameI, argv[1]);
+        fileNameO = (char *)malloc(strlen(argv[1]) + 1);
+        strcpy(fileNameO, argv[1]);
+
+        ReadFile(fileNameI);
+    }
+
     int min = 0;
-
-    // Matriz para o tempo de cada job em cada maquina
-    int jobTime[3][3] = {
-        {3, 2, 2},
-        {2, 1, 4},
-        {4, 3, 1},
-    };
-
-    // Matriz para o numero de cada maquina de cada operação
-    int jobM[3][3] = {
-        {0, 3, 2},
-        {0, 2, 1},
-        {1, 2, 3},
-    };
-
-    // Matriz para o tempo de inicio de cada operação ---> Solução
-    int jobSolution[3][3];
 
     // Contador dos instantes de tempo
     int time = 0;
 
-    // Calculo dos tempos de inicio
-    for (int y = 0; y < 3; y++)
-    {
-        for (int x = 0; x < 3; x++)
-        {
-            jobSolution[y][x] = time;
-            time += jobTime[y][x];
-        }
-    }
+    // // Calculo dos tempos de inicio
+    // for (int y = 0; y < 3; y++)
+    // {
+    //     for (int x = 0; x < 3; x++)
+    //     {
+    //         jobSolution[y][x] = time;
+    //         time += jobTime[y][x];
+    //     }
+    // }
 
-    // Escrita do resultado na consola
-    PrintJobs(3, 3, jobSolution, time);
+    // // Escrita do resultado na consola
+    // PrintJobs(maxMan, maxJobs, jobSolution, time);
 
     return 1;
 }
@@ -101,3 +121,31 @@ void PrintJobs(int y, int x, int jobSolution[y][x], int totalTime)
 //
 //
 //
+
+void ReadFile(char *fileName)
+{
+
+    FILE *fpInput = fopen(fileName, "r");
+    if (!fpInput)
+    {
+        perror("fopen");
+        return;
+    }
+
+    // fread(buffer, sizeof(*buffer), ARRAY_SIZE(buffer), fpInput);
+
+    char buffer[256];
+
+    int x = 0, y = 0, i = 0;
+
+    fscanf(fpInput, "%d %d", &y, &x);
+
+    fread(buffer, sizeof(*buffer), ARRAY_SIZE(buffer), fpInput);
+
+    printf("%d %d\n", y, x);
+    printf("%s\n", buffer);
+
+    fclose(fpInput);
+
+    // printf("%s", buffer);
+}
