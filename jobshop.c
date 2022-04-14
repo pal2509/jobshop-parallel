@@ -123,9 +123,11 @@ void PrintJobs(int y, int x, int jobSolution[y][x], int totalTime)
 //
 //
 
+// Função para a leitura dos ficheiros no formato Fisher and Thompson para as matrizes globais
 void ReadFile(char *fileName)
 {
 
+    // Abertura do ficheiro para leitura
     FILE *fpInput = fopen(fileName, "r");
     if (!fpInput)
     {
@@ -133,28 +135,34 @@ void ReadFile(char *fileName)
         return;
     }
 
-    // fread(buffer, sizeof(*buffer), ARRAY_SIZE(buffer), fpInput);
-
+    // buffer de leitura
     char buffer[2048];
 
     int x = 0, y = 0;
 
+    // Leitura da primeira linha que indica o tamanho da matriz
     fscanf(fpInput, "%d %d", &maxJobs, &maxMan);
     printf("Matrix size:\nNr lines:%d\nNr colums:%d\n", maxJobs, maxMan);
 
+    // Leitura do restante ficheiro para o buffer
     fread(buffer, sizeof(*buffer), ARRAY_SIZE(buffer), fpInput);
 
+    // Caracter de serapação dos numeros
     char *delim = " ";
 
+    // Função que parte uma string segundo um separador
     char *ptr = strtok(buffer, delim);
 
     int i = 0, nr = 0, job = 0, time = 0, man = 0;
 
+    // Leitura dos caracteres separados
     while (ptr != NULL)
     {
+        // Conversão para inteiro
         nr = atoi(ptr);
         // printf("%d ", nr);
 
+        // Reset dos contadores para se passar para outra linha da matriz
         if (i == maxMan * 2 - 1)
         {
 
@@ -164,6 +172,7 @@ void ReadFile(char *fileName)
             job++;
         }
 
+        // Preenchimento das matrizes segundo a iteração que estamos for par ou impar
         if (i % 2 == 0)
         {
 
@@ -177,6 +186,7 @@ void ReadFile(char *fileName)
             time++;
         }
 
+        // Chamada da função para devolver outra string
         ptr = strtok(NULL, delim);
         i++;
     }
@@ -194,5 +204,6 @@ void ReadFile(char *fileName)
     //     }
     // }
 
+    // Fechar o ficheiro
     fclose(fpInput);
 }
