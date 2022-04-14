@@ -139,8 +139,8 @@ void ReadFile(char *fileName)
 
     int x = 0, y = 0;
 
-    fscanf(fpInput, "%d %d", &y, &x);
-    printf("Matrix size:\nNr lines:%d\nNr colums:%d\n", y, x);
+    fscanf(fpInput, "%d %d", &maxJobs, &maxMan);
+    printf("Matrix size:\nNr lines:%d\nNr colums:%d\n", maxJobs, maxMan);
 
     fread(buffer, sizeof(*buffer), ARRAY_SIZE(buffer), fpInput);
 
@@ -148,11 +148,51 @@ void ReadFile(char *fileName)
 
     char *ptr = strtok(buffer, delim);
 
+    int i = 0, nr = 0, job = 0, time = 0, man = 0;
+
     while (ptr != NULL)
     {
-        printf("%d ", atoi(ptr));
+        nr = atoi(ptr);
+        // printf("%d ", nr);
+
+        if (i == maxMan * 2 - 1)
+        {
+
+            man = 0;
+            time = 0;
+            i = 0;
+            job++;
+        }
+
+        if (i % 2 == 0)
+        {
+
+            jobM[job][man] = nr;
+            man++;
+        }
+        else
+        {
+
+            jobTime[job][time] = nr;
+            time++;
+        }
+
         ptr = strtok(NULL, delim);
+        i++;
     }
+
+    // printf("\n");
+    // printf("%d %d\n", maxJobs, maxMan);
+
+    // for (int i = 0; i < maxJobs; i++)
+    // {
+    //     printf("job nr:%d\n", i);
+    //     for (int j = 0; j < maxMan; j++)
+    //     {
+    //         printf("M:%d ", jobM[i][j]);
+    //         printf("T:%d \n", jobTime[i][j]);
+    //     }
+    // }
 
     fclose(fpInput);
 }
