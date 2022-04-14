@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 #define MAX 100
@@ -134,18 +135,24 @@ void ReadFile(char *fileName)
 
     // fread(buffer, sizeof(*buffer), ARRAY_SIZE(buffer), fpInput);
 
-    char buffer[256];
+    char buffer[2048];
 
-    int x = 0, y = 0, i = 0;
+    int x = 0, y = 0;
 
     fscanf(fpInput, "%d %d", &y, &x);
+    printf("Matrix size:\nNr lines:%d\nNr colums:%d\n", y, x);
 
     fread(buffer, sizeof(*buffer), ARRAY_SIZE(buffer), fpInput);
 
-    printf("%d %d\n", y, x);
-    printf("%s\n", buffer);
+    char *delim = " ";
+
+    char *ptr = strtok(buffer, delim);
+
+    while (ptr != NULL)
+    {
+        printf("%d ", atoi(ptr));
+        ptr = strtok(NULL, delim);
+    }
 
     fclose(fpInput);
-
-    // printf("%s", buffer);
 }
