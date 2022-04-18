@@ -48,17 +48,17 @@ int main(int argc, char *argv[])
     // Contador dos instantes de tempo
     int time = 0;
 
-    // // Calculo dos tempos de inicio
-    // for (int y = 0; y < 3; y++)
-    // {
-    //     for (int x = 0; x < 3; x++)
-    //     {
-    //         jobSolution[y][x] = time;
-    //         time += jobTime[y][x];
-    //     }
-    // }
+    // Calculo dos tempos de inicio
+    for (int y = 0; y < 3; y++)
+    {
+        for (int x = 0; x < 3; x++)
+        {
+            jobSolution[y][x] = time;
+            time += jobTime[y][x];
+        }
+    }
 
-    // // Escrita do resultado na consola
+    // Escrita do resultado na consola
     // PrintJobs(maxMan, maxJobs, jobSolution, time);
 
     return 1;
@@ -148,22 +148,24 @@ void ReadFile(char *fileName)
     fread(buffer, sizeof(*buffer), ARRAY_SIZE(buffer), fpInput);
 
     // Caracter de serapação dos numeros
-    char *delim = " ";
+    char *delim = " \n";
 
+    printf("buffer: %s\n", buffer);
     // Função que parte uma string segundo um separador
     char *ptr = strtok(buffer, delim);
 
     int i = 0, nr = 0, job = 0, time = 0, man = 0;
+    ptr = strtok(NULL, delim);
 
     // Leitura dos caracteres separados
     while (ptr != NULL)
     {
         // Conversão para inteiro
         nr = atoi(ptr);
-        // printf("%d ", nr);
+        printf("%d ", nr);
 
         // Reset dos contadores para se passar para outra linha da matriz
-        if (i == maxMan * 2 - 1)
+        if (i == maxMan * 2)
         {
 
             man = 0;
@@ -191,18 +193,19 @@ void ReadFile(char *fileName)
         i++;
     }
 
-    // printf("\n");
-    // printf("%d %d\n", maxJobs, maxMan);
+    printf("\n");
+    printf("%d %d\n", maxJobs, maxMan);
 
-    // for (int i = 0; i < maxJobs; i++)
-    // {
-    //     printf("job nr:%d\n", i);
-    //     for (int j = 0; j < maxMan; j++)
-    //     {
-    //         printf("M:%d ", jobM[i][j]);
-    //         printf("T:%d \n", jobTime[i][j]);
-    //     }
-    // }
+    for (int i = 0; i < maxJobs; i++)
+    {
+        printf("job nr:%d ", i);
+        for (int j = 0; j < maxMan; j++)
+        {
+            printf("M:%d ", jobM[i][j]);
+            printf("T:%d ", jobTime[i][j]);
+        }
+        printf("\n");
+    }
 
     // Fechar o ficheiro
     fclose(fpInput);
