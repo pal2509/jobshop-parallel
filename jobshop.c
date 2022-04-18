@@ -2,9 +2,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 #define MAX 100
+#define MAXTIME 10000
 
 int maxJobs = 0;
 int maxMac = 0;
@@ -18,8 +20,12 @@ int jobM[MAX][MAX];
 // Matriz para o tempo de inicio de cada operação ---> Solução
 int jobSolution[MAX][MAX];
 
+int Machines[MAXTIME][MAX];
+
 void PrintJobs(int y, int x, int totalTime);
 void ReadFile(char *fileName);
+void InsertJob(int machine, int time, int jobDuration, int jobNr);
+bool verifyPreviousOp(int job, int op);
 
 int main(int argc, char *argv[])
 {
@@ -48,22 +54,118 @@ int main(int argc, char *argv[])
     // Contador dos instantes de tempo
     int time = 0;
 
-    printf("Jobs: %d\n", maxJobs);
-    printf("Machines: %d\n", maxMac);
-    // Calculo dos tempos de inicio
-    for (int y = 0; y < maxJobs; y++)
-    {
-        for (int x = 0; x < maxMac; x++)
+    // printf("Jobs: %d\n", maxJobs);
+    // printf("Machines: %d\n", maxMac);
+    // // Calculo dos tempos de inicio
+    // for (int y = 0; y < maxJobs; y++)
+    // {
+    //     for (int x = 0; x < maxMac; x++)
+    //     {
+    //         jobSolution[y][x] = time;
+    //         time += jobTime[y][x];
+    //     }
+    // }
+
+    for (int i = 0; i < MAX; i++)
+        for (int j = 0; j < MAX; j++)
         {
-            jobSolution[y][x] = time;
-            time += jobTime[y][x];
+            jobSolution[i][j] = -1;
+        }
+
+    for (int i = 0; i < MAXTIME; i++)
+        for (int j = 0; j < MAX; j++)
+        {
+            Machines[i][j] = -1;
+        }
+
+    int y = 0, x = 0, max = 1, machine, job = 0;
+
+    while (y < maxJobs && x < maxMac)
+    {
+        printf("s:%d ", jobSolution[job][x]);
+        if (jobSolution[job][x] == -1)
+        {
+            printf("p:%d ", verifyPreviousOp(job, x));
+            if (verifyPreviousOp(job, x))
+            {
+
+                machine = jobM[job][x];
+                printf("m:%d ", machine);
+                if (Machines[time][machine] == -1)
+                {
+                    if (max < jobTime[job][x])
+                        max = jobTime[job][x];
+                    InsertJob(jobM[job][x], time, jobTime[job][x], job);
+                    jobSolution[job][x] = time;
+                }
+            }
+            else
+            {
+                printf("m:%d ", machine);
+                machine = jobM[job][x - 1];
+                if (Machines[time][jobM[job][x - 1]] == -1)
+                {
+                    if (max < jobTime[job][x - 1])
+                        max = jobTime[job][x - 1];
+                    InsertJob(jobM[job][x - 1], time, jobTime[job][x - 1], job);
+                    jobSolution[job][x - 1] = time;
+                }
+            }
+        }
+
+        // printf("y: %d, x: %d, job:%d , time: %d \n", y, x, job, time);
+        // Confições de progressão do ciclo
+        if (job == maxJobs - 1)
+        {
+            x++;
+            job = y;
+            if (x == maxMac)
+            {
+                y++;
+                x = 0;
+                time = time + max;
+                max = 1;
+            }
+            else
+            {
+
+                time = time + max;
+                max = 1;
+            }
+        }
+        else
+        {
+
+            job++;
         }
     }
 
+    printf("\n\t\tSOLUÇÃO\n");
     // Escrita do resultado na consola
     PrintJobs(maxMac, maxJobs, time);
 
     return 1;
+}
+
+bool verifyPreviousOp(int job, int op)
+{
+    if (op > 0)
+    {
+        if (jobSolution[job][op - 1] == -1)
+            return false;
+        else
+            return true;
+    }
+    else
+        return true;
+}
+
+void InsertJob(int machine, int time, int jobDuration, int jobNr)
+{
+    for (int i = time; i < time + jobDuration; i++)
+    {
+        Machines[i][machine] = jobNr;
+    }
 }
 
 // job0 (m0,3) m(1,2) m(2,2)
@@ -92,7 +194,7 @@ void PrintJobs(int y, int x, int totalTime)
             printf("Start time: %d\t", jobSolution[i][j]);
         printf("\n");
     }
-    printf("Total time %d: \n", totalTime);
+    printf("Total time: %d \n", totalTime);
 }
 
 // Pior solução
