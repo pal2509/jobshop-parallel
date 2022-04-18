@@ -54,18 +54,21 @@ int main(int argc, char *argv[])
     // Contador dos instantes de tempo
     int time = 0;
 
-    // printf("Jobs: %d\n", maxJobs);
-    // printf("Machines: %d\n", maxMac);
-    // // Calculo dos tempos de inicio
-    // for (int y = 0; y < maxJobs; y++)
-    // {
-    //     for (int x = 0; x < maxMac; x++)
-    //     {
-    //         jobSolution[y][x] = time;
-    //         time += jobTime[y][x];
-    //     }
-    // }
+    // ALGORITMO SIMPLES PARA A PIOR SOLUÇÃO POSSIVEL
+    //  printf("Jobs: %d\n", maxJobs);
+    //  printf("Machines: %d\n", maxMac);
+    //  // Calculo dos tempos de inicio
+    //  for (int y = 0; y < maxJobs; y++)
+    //  {
+    //      for (int x = 0; x < maxMac; x++)
+    //      {
+    //          jobSolution[y][x] = time;
+    //          time += jobTime[y][x];
+    //      }
+    //  }
 
+    // O MEU ALGORITMO
+    // Por os arrays com os valores a -1
     for (int i = 0; i < MAX; i++)
         for (int j = 0; j < MAX; j++)
         {
@@ -78,7 +81,7 @@ int main(int argc, char *argv[])
             Machines[i][j] = -1;
         }
 
-    int y = 0, x = 0, max = 1, machine, job = 0;
+    int y = 0, x = 0, max = 0, machine, job = 0;
 
     while (y < maxJobs && x < maxMac)
     {
@@ -88,9 +91,9 @@ int main(int argc, char *argv[])
             printf("p:%d ", verifyPreviousOp(job, x));
             if (verifyPreviousOp(job, x))
             {
-
+                printf("a ");
                 machine = jobM[job][x];
-                printf("m:%d ", machine);
+                // printf("m:%d ", machine);
                 if (Machines[time][machine] == -1)
                 {
                     if (max < jobTime[job][x])
@@ -101,7 +104,9 @@ int main(int argc, char *argv[])
             }
             else
             {
-                printf("m:%d ", machine);
+                printf("b ");
+
+                // printf("m:%d ", machine);
                 machine = jobM[job][x - 1];
                 if (Machines[time][jobM[job][x - 1]] == -1)
                 {
@@ -113,7 +118,8 @@ int main(int argc, char *argv[])
             }
         }
 
-        // printf("y: %d, x: %d, job:%d , time: %d \n", y, x, job, time);
+        // printf("\nTime: %d\n", time);
+        printf("y: %d, x: %d, job:%d , time: %d \n", y, x, job, time);
         // Confições de progressão do ciclo
         if (job == maxJobs - 1)
         {
@@ -123,19 +129,15 @@ int main(int argc, char *argv[])
             {
                 y++;
                 x = 0;
-                time = time + max;
-                max = 1;
             }
-            else
+            if (max != 0)
             {
-
                 time = time + max;
-                max = 1;
+                max = 0;
             }
         }
         else
         {
-
             job++;
         }
     }
