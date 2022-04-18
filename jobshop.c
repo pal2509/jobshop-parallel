@@ -7,7 +7,7 @@
 #define MAX 100
 
 int maxJobs = 0;
-int maxMan = 0;
+int maxMac = 0;
 
 // Matriz para o tempo de cada job em cada maquina
 int jobTime[MAX][MAX];
@@ -18,7 +18,7 @@ int jobM[MAX][MAX];
 // Matriz para o tempo de inicio de cada operação ---> Solução
 int jobSolution[MAX][MAX];
 
-void PrintJobs(int y, int x, int jobSolution[y][x], int totalTime);
+void PrintJobs(int y, int x, int totalTime);
 void ReadFile(char *fileName);
 
 int main(int argc, char *argv[])
@@ -48,10 +48,12 @@ int main(int argc, char *argv[])
     // Contador dos instantes de tempo
     int time = 0;
 
+    printf("Jobs: %d\n", maxJobs);
+    printf("Machines: %d\n", maxMac);
     // Calculo dos tempos de inicio
-    for (int y = 0; y < 3; y++)
+    for (int y = 0; y < maxJobs; y++)
     {
-        for (int x = 0; x < 3; x++)
+        for (int x = 0; x < maxMac; x++)
         {
             jobSolution[y][x] = time;
             time += jobTime[y][x];
@@ -59,7 +61,7 @@ int main(int argc, char *argv[])
     }
 
     // Escrita do resultado na consola
-    // PrintJobs(maxMan, maxJobs, jobSolution, time);
+    PrintJobs(maxMac, maxJobs, time);
 
     return 1;
 }
@@ -72,7 +74,7 @@ int main(int argc, char *argv[])
 //  Job 0: m0 t3	m1 t2	m2 t2
 //  Job 1: m0 t2	m2 t1	m1 t4
 //  Job 2: m1 t4	m2 t3	m-1 t-1
-void PrintJobs(int y, int x, int jobSolution[y][x], int totalTime)
+void PrintJobs(int y, int x, int totalTime)
 {
     printf("\t\t");
     for (int i = 0; i < x; i++)
@@ -141,8 +143,8 @@ void ReadFile(char *fileName)
     int x = 0, y = 0;
 
     // Leitura da primeira linha que indica o tamanho da matriz
-    fscanf(fpInput, "%d %d", &maxJobs, &maxMan);
-    printf("Matrix size:\nNr lines:%d\nNr colums:%d\n", maxJobs, maxMan);
+    fscanf(fpInput, "%d %d", &maxJobs, &maxMac);
+    printf("Matrix size:\nNr lines:%d\nNr colums:%d\n", maxJobs, maxMac);
 
     // Leitura do restante ficheiro para o buffer
     fread(buffer, sizeof(*buffer), ARRAY_SIZE(buffer), fpInput);
@@ -162,10 +164,10 @@ void ReadFile(char *fileName)
     {
         // Conversão para inteiro
         nr = atoi(ptr);
-        printf("%d ", nr);
+        // printf("%d ", nr);
 
         // Reset dos contadores para se passar para outra linha da matriz
-        if (i == maxMan * 2)
+        if (i == maxMac * 2)
         {
 
             man = 0;
@@ -194,12 +196,12 @@ void ReadFile(char *fileName)
     }
 
     printf("\n");
-    printf("%d %d\n", maxJobs, maxMan);
+    printf("%d %d\n", maxJobs, maxMac);
 
     for (int i = 0; i < maxJobs; i++)
     {
-        printf("job nr:%d ", i);
-        for (int j = 0; j < maxMan; j++)
+        printf("job:%d ", i);
+        for (int j = 0; j < maxMac; j++)
         {
             printf("M:%d ", jobM[i][j]);
             printf("T:%d ", jobTime[i][j]);
