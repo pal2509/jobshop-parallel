@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
-#define MAX 100
+#define MAX 1000
 #define MAXTIME 10000
 
 int maxJobs = 0;
@@ -85,42 +85,46 @@ int main(int argc, char *argv[])
 
     while (y < maxJobs && x < maxMac)
     {
-        printf("s:%d ", jobSolution[job][x]);
+        // printf("s:%d ", jobSolution[job][x]);
         if (jobSolution[job][x] == -1)
         {
-            printf("p:%d ", verifyPreviousOp(job, x));
+            // printf("p:%d ", verifyPreviousOp(job, x));
             if (verifyPreviousOp(job, x))
             {
-                printf("a ");
+
                 machine = jobM[job][x];
-                // printf("m:%d ", machine);
+                // printf("m:%d ", Machines[time][machine]);
+                //  printf("m:%d ", machine);
                 if (Machines[time][machine] == -1)
                 {
                     if (max < jobTime[job][x])
                         max = jobTime[job][x];
-                    InsertJob(jobM[job][x], time, jobTime[job][x], job);
+                    InsertJob(machine, time, jobTime[job][x], job);
                     jobSolution[job][x] = time;
                 }
             }
-            else
-            {
-                printf("b ");
+            // Ideia seria ir ver qual operação anterior não está efectuada e a iniciar
+            //  else
+            //  {
+            //      printf("b ");
 
-                // printf("m:%d ", machine);
-                machine = jobM[job][x - 1];
-                if (Machines[time][jobM[job][x - 1]] == -1)
-                {
-                    if (max < jobTime[job][x - 1])
-                        max = jobTime[job][x - 1];
-                    InsertJob(jobM[job][x - 1], time, jobTime[job][x - 1], job);
-                    jobSolution[job][x - 1] = time;
-                }
-            }
+            //     // printf("m:%d ", machine);
+            //     machine = jobM[job][x - 1];
+            //     if (Machines[time][jobM[job][x - 1]] == -1)
+            //     {
+            //         if (max < jobTime[job][x - 1])
+            //             max = jobTime[job][x - 1];
+            //         InsertJob(jobM[job][x - 1], time, jobTime[job][x - 1], job);
+            //         jobSolution[job][x - 1] = time;
+            //     }
+            // }
         }
 
         // printf("\nTime: %d\n", time);
         printf("y: %d, x: %d, job:%d , time: %d \n", y, x, job, time);
-        // Confições de progressão do ciclo
+
+        // O ciclo percorre da esquerda para a direita e simultaneamente percorre a coluna de cada operação
+        //  Confições de progressão do ciclo
         if (job == maxJobs - 1)
         {
             x++;
@@ -164,6 +168,8 @@ bool verifyPreviousOp(int job, int op)
 
 void InsertJob(int machine, int time, int jobDuration, int jobNr)
 {
+    printf("insert:%d %d ", machine, jobNr);
+
     for (int i = time; i < time + jobDuration; i++)
     {
         Machines[i][machine] = jobNr;
@@ -180,10 +186,10 @@ void InsertJob(int machine, int time, int jobDuration, int jobNr)
 //  Job 2: m1 t4	m2 t3	m-1 t-1
 void PrintJobs(int y, int x, int totalTime)
 {
-    printf("\t\t");
+    printf("\t");
     for (int i = 0; i < x; i++)
     {
-        printf("O-%d\t\t", i);
+        printf(" O-%d\t", i);
     }
 
     printf("\n");
@@ -193,7 +199,7 @@ void PrintJobs(int y, int x, int totalTime)
         printf("Job %d: ", i);
 
         for (int j = 0; j < x; j++)
-            printf("Start time: %d\t", jobSolution[i][j]);
+            printf(" %d\t", jobSolution[i][j]);
         printf("\n");
     }
     printf("Total time: %d \n", totalTime);
@@ -261,7 +267,9 @@ void ReadFile(char *fileName)
     char *ptr = strtok(buffer, delim);
 
     int i = 0, nr = 0, job = 0, time = 0, man = 0;
-    ptr = strtok(NULL, delim);
+
+    // Verificar
+    //  ptr = strtok(NULL, delim);
 
     // Leitura dos caracteres separados
     while (ptr != NULL)
