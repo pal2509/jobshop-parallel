@@ -86,39 +86,37 @@ int main(int argc, char *argv[])
     while (y < maxJobs && x < maxMac)
     {
         // printf("s:%d ", jobSolution[job][x]);
-        if (jobSolution[job][x] == -1)
+
+        // printf("p:%d ", verifyPreviousOp(job, x));
+        if (jobSolution[job][x] == -1 && verifyPreviousOp(job, x))
         {
-            // printf("p:%d ", verifyPreviousOp(job, x));
-            if (verifyPreviousOp(job, x))
+
+            machine = jobM[job][x];
+            // printf("m:%d ", Machines[time][machine]);
+            //  printf("m:%d ", machine);
+            if (Machines[time][machine] == -1)
             {
-
-                machine = jobM[job][x];
-                // printf("m:%d ", Machines[time][machine]);
-                //  printf("m:%d ", machine);
-                if (Machines[time][machine] == -1)
-                {
-                    if (max < jobTime[job][x])
-                        max = jobTime[job][x];
-                    InsertJob(machine, time, jobTime[job][x], job);
-                    jobSolution[job][x] = time;
-                }
+                if (max < jobTime[job][x])
+                    max = jobTime[job][x];
+                InsertJob(machine, time, jobTime[job][x], job);
+                jobSolution[job][x] = time;
             }
-            // Ideia seria ir ver qual operação anterior não está efectuada e a iniciar
-            //  else
-            //  {
-            //      printf("b ");
-
-            //     // printf("m:%d ", machine);
-            //     machine = jobM[job][x - 1];
-            //     if (Machines[time][jobM[job][x - 1]] == -1)
-            //     {
-            //         if (max < jobTime[job][x - 1])
-            //             max = jobTime[job][x - 1];
-            //         InsertJob(jobM[job][x - 1], time, jobTime[job][x - 1], job);
-            //         jobSolution[job][x - 1] = time;
-            //     }
-            // }
         }
+        // Ideia seria ir ver qual operação anterior não está efectuada e a iniciar
+        //  else
+        //  {
+        //      printf("b ");
+
+        //     // printf("m:%d ", machine);
+        //     machine = jobM[job][x - 1];
+        //     if (Machines[time][jobM[job][x - 1]] == -1)
+        //     {
+        //         if (max < jobTime[job][x - 1])
+        //             max = jobTime[job][x - 1];
+        //         InsertJob(jobM[job][x - 1], time, jobTime[job][x - 1], job);
+        //         jobSolution[job][x - 1] = time;
+        //     }
+        // }
 
         // printf("\nTime: %d\n", time);
         // printf("y: %d, x: %d, job:%d , time: %d \n", y, x, job, time);
@@ -326,7 +324,7 @@ void ReadFile(char *fileName)
 }
 
 // Função para escrita da solução num ficheiro
-void WriteFile(char *filename, int maxJobs, int maxMac, int jobSolution[][])
+void WriteFile(char *filename, int maxJobs, int maxMac, int jobSolution[maxJobs][maxMac])
 {
     // TODO file writing
 }
