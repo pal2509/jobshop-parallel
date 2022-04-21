@@ -292,7 +292,7 @@ void *JobShop(void *rank)
 {
     int y = 0, x = 0, max = 0, machine, job = 0, time = 0;
 
-    while (y < maxJobs && x < maxMac)
+    while (y < maxJobs)
     {
         if (jobSolution[job][x] == -1 && verifyPreviousOp(job, x))
         {

@@ -79,9 +79,6 @@ int main(int argc, char *argv[])
             Machines[i][j] = -1;
         }
 
-    long thread;
-    pthread_t *thread_handles;
-
     int time = JobShop();
 
     printf("\n\t\tSOLUÇÃO\n");
@@ -273,7 +270,7 @@ int JobShop()
 {
     int y = 0, x = 0, max = 0, machine, job = 0, time = 0;
 
-    while (y < maxJobs && x < maxMac)
+    while (y < maxJobs)
     {
         if (jobSolution[job][x] == -1 && verifyPreviousOp(job, x))
         {
