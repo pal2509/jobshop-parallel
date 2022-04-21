@@ -324,3 +324,9 @@ void ReadFile(char *fileName)
     // Fechar o ficheiro
     fclose(fpInput);
 }
+
+// Função para escrita da solução num ficheiro
+void WriteFile(char *filename, int maxJobs, int maxMac, int jobSolution[][])
+{
+    // TODO file writing
+}
