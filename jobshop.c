@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <pthread.h>
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 #define MAX 1000
@@ -10,6 +11,8 @@
 
 int maxJobs = 0;
 int maxMac = 0;
+
+int thread_count;
 
 // Matriz para o tempo de cada job em cada maquina
 int jobTime[MAX][MAX];
@@ -26,6 +29,7 @@ void PrintJobs(int y, int x, int totalTime);
 void ReadFile(char *fileName);
 void InsertJob(int machine, int time, int jobDuration, int jobNr);
 bool verifyPreviousOp(int job, int op);
+int JobShop();
 
 int main(int argc, char *argv[])
 {
@@ -43,16 +47,11 @@ int main(int argc, char *argv[])
 
         fileNameI = (char *)malloc(strlen(argv[1]) + 1);
         strcpy(fileNameI, argv[1]);
-        fileNameO = (char *)malloc(strlen(argv[1]) + 1);
-        strcpy(fileNameO, argv[1]);
+        fileNameO = (char *)malloc(strlen(argv[2]) + 1);
+        strcpy(fileNameO, argv[2]);
 
         ReadFile(fileNameI);
     }
-
-    int min = 0;
-
-    // Contador dos instantes de tempo
-    int time = 0;
 
     // ALGORITMO SIMPLES PARA A PIOR SOLUÇÃO POSSIVEL
     //  printf("Jobs: %d\n", maxJobs);
@@ -67,7 +66,6 @@ int main(int argc, char *argv[])
     //      }
     //  }
 
-    // O MEU ALGORITMO
     // Por os arrays com os valores a -1
     for (int i = 0; i < MAX; i++)
         for (int j = 0; j < MAX; j++)
@@ -81,68 +79,10 @@ int main(int argc, char *argv[])
             Machines[i][j] = -1;
         }
 
-    int y = 0, x = 0, max = 0, machine, job = 0;
+    long thread;
+    pthread_t *thread_handles;
 
-    while (y < maxJobs && x < maxMac)
-    {
-        // printf("s:%d ", jobSolution[job][x]);
-
-        // printf("p:%d ", verifyPreviousOp(job, x));
-        if (jobSolution[job][x] == -1 && verifyPreviousOp(job, x))
-        {
-
-            machine = jobM[job][x];
-            // printf("m:%d ", Machines[time][machine]);
-            //  printf("m:%d ", machine);
-            if (Machines[time][machine] == -1)
-            {
-                if (max < jobTime[job][x])
-                    max = jobTime[job][x];
-                InsertJob(machine, time, jobTime[job][x], job);
-                jobSolution[job][x] = time;
-            }
-        }
-        // Ideia seria ir ver qual operação anterior não está efectuada e a iniciar
-        //  else
-        //  {
-        //      printf("b ");
-
-        //     // printf("m:%d ", machine);
-        //     machine = jobM[job][x - 1];
-        //     if (Machines[time][jobM[job][x - 1]] == -1)
-        //     {
-        //         if (max < jobTime[job][x - 1])
-        //             max = jobTime[job][x - 1];
-        //         InsertJob(jobM[job][x - 1], time, jobTime[job][x - 1], job);
-        //         jobSolution[job][x - 1] = time;
-        //     }
-        // }
-
-        // printf("\nTime: %d\n", time);
-        // printf("y: %d, x: %d, job:%d , time: %d \n", y, x, job, time);
-
-        // O ciclo percorre da esquerda para a direita e simultaneamente percorre a coluna de cada operação
-        //  Confições de progressão do ciclo
-        if (job == maxJobs - 1)
-        {
-            x++;
-            job = y;
-            if (x == maxMac)
-            {
-                y++;
-                x = 0;
-            }
-            if (max != 0)
-            {
-                time = time + max;
-                max = 0;
-            }
-        }
-        else
-        {
-            job++;
-        }
-    }
+    int time = JobShop();
 
     printf("\n\t\tSOLUÇÃO\n");
     // Escrita do resultado na consola
@@ -260,8 +200,8 @@ void ReadFile(char *fileName)
     // Caracter de serapação dos numeros
     char *delim = " \n";
 
-    printf("buffer: %s\n", buffer);
-    // Função que parte uma string segundo um separador
+    // printf("buffer: %s\n", buffer);
+    //  Função que parte uma string segundo um separador
     char *ptr = strtok(buffer, delim);
 
     int i = 0, nr = 0, job = 0, time = 0, man = 0;
@@ -305,8 +245,8 @@ void ReadFile(char *fileName)
         i++;
     }
 
-    printf("\n");
-    printf("%d %d\n", maxJobs, maxMac);
+    // printf("\n");
+    // printf("%d %d\n", maxJobs, maxMac);
 
     for (int i = 0; i < maxJobs; i++)
     {
@@ -327,4 +267,47 @@ void ReadFile(char *fileName)
 void WriteFile(char *filename, int maxJobs, int maxMac, int jobSolution[maxJobs][maxMac])
 {
     // TODO file writing
+}
+
+int JobShop()
+{
+    int y = 0, x = 0, max = 0, machine, job = 0, time = 0;
+
+    while (y < maxJobs && x < maxMac)
+    {
+        if (jobSolution[job][x] == -1 && verifyPreviousOp(job, x))
+        {
+            machine = jobM[job][x];
+            if (Machines[time][machine] == -1)
+            {
+                if (max < jobTime[job][x])
+                    max = jobTime[job][x];
+                InsertJob(machine, time, jobTime[job][x], job);
+                jobSolution[job][x] = time;
+            }
+        }
+        // O ciclo percorre da esquerda para a direita e simultaneamente percorre a coluna de cada operação
+        //  Confições de progressão do ciclo
+        if (job == maxJobs - 1)
+        {
+            x++;
+            job = y;
+            if (x == maxMac)
+            {
+                y++;
+                x = 0;
+            }
+            if (max != 0)
+            {
+                time = time + max;
+                max = 0;
+            }
+        }
+        else
+        {
+            job++;
+        }
+    }
+
+    return time;
 }
