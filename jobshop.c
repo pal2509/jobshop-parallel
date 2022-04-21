@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
         }
 
         // printf("\nTime: %d\n", time);
-        printf("y: %d, x: %d, job:%d , time: %d \n", y, x, job, time);
+        // printf("y: %d, x: %d, job:%d , time: %d \n", y, x, job, time);
 
         // O ciclo percorre da esquerda para a direita e simultaneamente percorre a coluna de cada operação
         //  Confições de progressão do ciclo
@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
 
     printf("\n\t\tSOLUÇÃO\n");
     // Escrita do resultado na consola
-    PrintJobs(maxMac, maxJobs, time);
+    PrintJobs(maxJobs, maxMac, time);
 
     return 1;
 }
@@ -168,7 +168,7 @@ bool verifyPreviousOp(int job, int op)
 
 void InsertJob(int machine, int time, int jobDuration, int jobNr)
 {
-    printf("insert:%d %d ", machine, jobNr);
+    // printf("insert:%d %d ", machine, jobNr);
 
     for (int i = time; i < time + jobDuration; i++)
     {
