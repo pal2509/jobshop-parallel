@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <pthread.h>
+#include <omp.h>
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 #define MAX 1000
@@ -14,6 +15,8 @@ int maxMac = 0;
 
 int thread_count;
 long counter = 0;
+
+pthread_mutex_t mutex;
 
 // Matriz para o tempo de cada job em cada maquina
 int jobTime[MAX][MAX];
@@ -30,7 +33,7 @@ void PrintJobs(int y, int x, int totalTime);
 void ReadFile(char *fileName);
 void InsertJob(int machine, int time, int jobDuration, int jobNr);
 bool verifyPreviousOp(int job, int op);
-void *JobShop(void *rank);
+int JobShop();
 
 int main(int argc, char *argv[])
 {
@@ -45,12 +48,12 @@ int main(int argc, char *argv[])
     {
         printf("%s\n", argv[1]);
         printf("%s\n", argv[2]);
-        printf("%s\n", argv[3]);
+        printf("%s\n", argv[2]);
 
-        fileNameI = (char *)malloc(strlen(argv[2]) + 1);
-        strcpy(fileNameI, argv[2]);
-        fileNameO = (char *)malloc(strlen(argv[3]) + 1);
-        strcpy(fileNameO, argv[3]);
+        fileNameI = (char *)malloc(strlen(argv[1]) + 1);
+        strcpy(fileNameI, argv[1]);
+        fileNameO = (char *)malloc(strlen(argv[2]) + 1);
+        strcpy(fileNameO, argv[2]);
 
         ReadFile(fileNameI);
     }
@@ -81,31 +84,33 @@ int main(int argc, char *argv[])
             Machines[i][j] = -1;
         }
 
-    long thread;
-    pthread_t *thread_handles;
+    // long thread;
+    // pthread_t *thread_handles;
 
-    thread_count = strtol(argv[1], NULL, 10);
+    // thread_count = strtol(argv[1], NULL, 10);
 
-    thread_handles = malloc(thread_count * sizeof(pthread_t));
+    // thread_handles = malloc(thread_count * sizeof(pthread_t));
 
-    printf("Thread_count: %d\n", thread_count);
+    // printf("Thread_count: %d\n", thread_count);
 
-    for (thread = 0; thread < thread_count; thread++)
-    {
-        pthread_create(&thread_handles[thread], NULL, JobShop, (void *)thread);
-    }
-    //  printf("Hello from the main thread\n");
+    // for (thread = 0; thread < thread_count; thread++)
+    // {
+    //     pthread_create(&thread_handles[thread], NULL, JobShop, (void *)thread);
+    // }
+    // //  printf("Hello from the main thread\n");
 
-    for (thread = 0; thread < thread_count; thread++)
-        pthread_join(thread_handles[thread], NULL);
+    // for (thread = 0; thread < thread_count; thread++)
+    //     pthread_join(thread_handles[thread], NULL);
 
-    printf("Main thread: total %ld\n", counter);
+    // printf("Main thread: total %ld\n", counter);
 
-    free(thread_handles);
+    // free(thread_handles);
+
+    int time = JobShop();
 
     printf("\n\t\tSOLUÇÃO\n");
     // Escrita do resultado na consola
-    PrintJobs(maxJobs, maxMac, 0);
+    PrintJobs(maxJobs, maxMac, time);
 
     return 1;
 }
@@ -217,7 +222,7 @@ void ReadFile(char *fileName)
     fread(buffer, sizeof(*buffer), ARRAY_SIZE(buffer), fpInput);
 
     // Caracter de serapação dos numeros
-    char *delim = " \n";
+    char *delim = " \r\n";
 
     // printf("buffer: %s\n", buffer);
     //  Função que parte uma string segundo um separador
@@ -288,45 +293,63 @@ void WriteFile(char *filename, int maxJobs, int maxMac, int jobSolution[maxJobs]
     // TODO file writing
 }
 
-void *JobShop(void *rank)
+int JobShop()
 {
-    int y = 0, x = 0, max = 0, machine, job = 0, time = 0;
+    // long nrThread = (long)rank;
+    // int myShare = maxJobs / thread_count;
+    // int y = 0, x = 0, max = 0, machine, job = y, time = 0;
+    // int maxJ = nrThread * myShare + myShare;
 
-    while (y < maxJobs)
+    // printf("t:%ld y:%d j:%d share:%d\n", nrThread, y, maxJ, myShare);
+
+    int time = 0;
+#pragma omp parallel
     {
-        if (jobSolution[job][x] == -1 && verifyPreviousOp(job, x))
+        int myShare = maxJobs / omp_get_num_threads();
+        int t = omp_get_thread_num();
+        int y = t * myShare, x = 0, machine, job = y, max = 0;
+        int maxJ = (t + 1) * myShare + myShare + 1;
+
+        printf("thread:%d y:%d maxJ:%d\n", t, y, maxJ);
+        while (y < maxJ)
         {
-            machine = jobM[job][x];
-            if (Machines[time][machine] == -1)
+#pragma omp critical
             {
-                if (max < jobTime[job][x])
-                    max = jobTime[job][x];
-                InsertJob(machine, time, jobTime[job][x], job);
-                jobSolution[job][x] = time;
+                if (jobSolution[job][x] == -1 && verifyPreviousOp(job, x))
+                {
+                    machine = jobM[job][x];
+                    if (Machines[time][machine] == -1)
+                    {
+                        if (max < jobTime[job][x])
+                            max = jobTime[job][x];
+                        InsertJob(machine, time, jobTime[job][x], job);
+                        jobSolution[job][x] = time;
+                    }
+                }
             }
-        }
-        // O ciclo percorre da esquerda para a direita e simultaneamente percorre a coluna de cada operação
-        //  Confições de progressão do ciclo
-        if (job == maxJobs - 1)
-        {
-            x++;
-            job = y;
-            if (x == maxMac)
+
+            // O ciclo percorre da esquerda para a direita e simultaneamente percorre a coluna de cada operação
+            //  Confições de progressão do ciclo
+            if (job == maxJ - 1)
             {
-                y++;
-                x = 0;
+                x++;
+                job = y;
+                if (x == maxMac)
+                {
+                    y++;
+                    x = 0;
+                }
+                if (max != 0)
+                {
+                    time = time + max;
+                    max = 0;
+                }
             }
-            if (max != 0)
+            else
             {
-                time = time + max;
-                max = 0;
+                job++;
             }
-        }
-        else
-        {
-            job++;
         }
     }
-
-    // return time;
+    return time;
 }
