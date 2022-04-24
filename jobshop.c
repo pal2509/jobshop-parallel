@@ -195,7 +195,7 @@ void ReadFile(char *fileName)
     fread(buffer, sizeof(*buffer), ARRAY_SIZE(buffer), fpInput);
 
     // Caracter de serapação dos numeros
-    char *delim = " \n";
+    char *delim = " \r\n";
 
     // printf("buffer: %s\n", buffer);
     //  Função que parte uma string segundo um separador
