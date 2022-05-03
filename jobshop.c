@@ -27,14 +27,14 @@ int Machines[MAXTIME][MAX];
 
 void PrintJobs(int y, int x, int totalTime);
 void ReadFile(char *fileName);
-void InsertJob(int machine, int time, int jobDuration, int jobNr);
+int InsertJob(int machine, int time, int jobDuration, int jobNr);
 bool verifyPreviousOp(int job, int op);
 int JobShop();
+int VerifySolution();
 
 int main(int argc, char *argv[])
 {
 
-    FILE *fpOutput;
     char *fileNameI;
     char *fileNameO;
 
@@ -85,6 +85,8 @@ int main(int argc, char *argv[])
     // Escrita do resultado na consola
     PrintJobs(maxJobs, maxMac, time);
 
+    printf("\nverify: %d\n", VerifySolution());
+
     return 1;
 }
 
@@ -101,13 +103,29 @@ bool verifyPreviousOp(int job, int op)
         return true;
 }
 
-void InsertJob(int machine, int time, int jobDuration, int jobNr)
+int InsertJob(int machine, int time, int jobDuration, int jobNr)
 {
     // printf("insert:%d %d ", machine, jobNr);
-
+    int slots = 0;
     for (int i = time; i < time + jobDuration; i++)
     {
-        Machines[i][machine] = jobNr;
+        if (Machines[i][machine] == -1)
+        {
+            slots++;
+        }
+    }
+
+    if (slots == jobDuration)
+    {
+        for (int i = time; i < time + jobDuration; i++)
+        {
+            Machines[i][machine] = jobNr;
+        }
+        return 1;
+    }
+    else
+    {
+        return 0;
     }
 }
 
@@ -307,4 +325,19 @@ int JobShop()
     }
 
     return time;
+}
+
+int VerifySolution()
+{
+    for (int y = 0; y < maxJobs; y++)
+        for (int x = 0; x < maxMac; x++)
+        {
+
+            if (x > 1 && jobSolution[y][x - 1] > jobSolution[y][x])
+            {
+                return 1;
+            }
+        }
+
+    return 0;
 }
