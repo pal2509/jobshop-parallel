@@ -16,6 +16,7 @@ int maxMac = 0;
 
 int thread_count;
 long counter = 0;
+int TotalTime = 0;
 
 pthread_mutex_t mutex;
 
@@ -76,34 +77,32 @@ int main(int argc, char *argv[])
     //      }
     //  }
 
-    // Por os arrays com os valores a -1
-    for (int i = 0; i < MAX; i++)
-        for (int j = 0; j < MAX; j++)
-        {
-            jobSolution[i][j] = -1;
-        }
-
-    for (int i = 0; i < MAXTIME; i++)
-        for (int j = 0; j < MAX; j++)
-        {
-            Machines[i][j] = -1;
-        }
-
     double sum;
-    int time = -1;
-
     for (int i = 0; i < 10; i++)
     {
 
+        // Por os arrays com os valores a -1
+        for (int i = 0; i < MAX; i++)
+            for (int j = 0; j < MAX; j++)
+            {
+                jobSolution[i][j] = -1;
+            }
+
+        for (int i = 0; i < MAXTIME; i++)
+            for (int j = 0; j < MAX; j++)
+            {
+                Machines[i][j] = -1;
+            }
+
         double startTime = getClock();
-        time = JobShop();
+        JobShop();
         double endTime = getClock();
         sum = sum + (endTime - startTime);
     }
 
     printf("\n\t\tSOLUÇÃO\n");
     //  Escrita do resultado na consola
-    PrintJobs(maxJobs, maxMac, time);
+    PrintJobs(maxJobs, maxMac, TotalTime);
 
     WriteFile(fileNameO);
 
@@ -360,7 +359,7 @@ int JobShop()
     // int maxJ = nrThread * myShare + myShare;
 
     // printf("t:%ld y:%d j:%d share:%d\n", nrThread, y, maxJ, myShare);
-    int t = 0;
+
 #pragma omp parallel
     {
         int time = 0;
@@ -448,9 +447,10 @@ int JobShop()
                 job++;
             }
         }
-        t = time;
+        printf("time:%d\n", time);
+        TotalTime = time;
     }
-    return t;
+    return 0;
 }
 
 int VerifySolution()
