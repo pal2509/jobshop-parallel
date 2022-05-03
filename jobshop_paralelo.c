@@ -36,7 +36,9 @@ void WriteFile(char *filename);
 int InsertJob(int machine, int time, int jobDuration, int jobNr);
 bool verifyPreviousOp(int job, int op);
 int VerifySolution();
+int countMachineSlots(int startTime, int endTime, int jobNr, int machineNr);
 int JobShop();
+void printMachineArray(int time);
 
 int main(int argc, char *argv[])
 {
@@ -87,42 +89,32 @@ int main(int argc, char *argv[])
             Machines[i][j] = -1;
         }
 
-    // long thread;
-    // pthread_t *thread_handles;
+    double sum;
+    int time = -1;
 
-    // thread_count = strtol(argv[1], NULL, 10);
+    for (int i = 0; i < 10; i++)
+    {
 
-    // thread_handles = malloc(thread_count * sizeof(pthread_t));
-
-    // printf("Thread_count: %d\n", thread_count);
-
-    // for (thread = 0; thread < thread_count; thread++)
-    // {
-    //     pthread_create(&thread_handles[thread], NULL, JobShop, (void *)thread);
-    // }
-    // //  printf("Hello from the main thread\n");
-
-    // for (thread = 0; thread < thread_count; thread++)
-    //     pthread_join(thread_handles[thread], NULL);
-
-    // printf("Main thread: total %ld\n", counter);
-
-    // free(thread_handles);
-
-    double startTime = getClock();
-    int time = JobShop();
-    double endTime = getClock();
+        double startTime = getClock();
+        time = JobShop();
+        double endTime = getClock();
+        sum = sum + (endTime - startTime);
+    }
 
     printf("\n\t\tSOLUÇÃO\n");
-    // Escrita do resultado na consola
+    //  Escrita do resultado na consola
     PrintJobs(maxJobs, maxMac, time);
 
     WriteFile(fileNameO);
 
     printf("\nverify: %d\n", VerifySolution());
-    printf("Tempo de inicio: %f\n", startTime);
-    printf("Tempo de fim: %f\n", endTime);
-    printf("Tempo de execução: %f\n", (double)((endTime - startTime)));
+    printf("Média de tempo 10x: %f\n", sum / 10);
+
+    // printMachineArray(70);
+
+    // printf("Tempo de inicio: %f\n", startTime);
+    // printf("Tempo de fim: %f\n", endTime);
+    // printf("Tempo de execução: %f\n", (double)((endTime - startTime)));
 
     return 1;
 }
@@ -194,6 +186,26 @@ void PrintJobs(int y, int x, int totalTime)
         printf("\n");
     }
     printf("Total time: %d \n", totalTime);
+}
+
+void printMachineArray(int time)
+{
+    printf("\t");
+    for (int i = 0; i < maxMac; i++)
+    {
+        printf(" M-%d\t", i);
+    }
+
+    printf("\n");
+
+    for (int i = 0; i < time; i++)
+    {
+        printf("T %d:\t", i);
+
+        for (int j = 0; j < maxMac; j++)
+            printf(" %d\t", Machines[i][j]);
+        printf("\n");
+    }
 }
 
 // Pior solução
@@ -348,10 +360,10 @@ int JobShop()
     // int maxJ = nrThread * myShare + myShare;
 
     // printf("t:%ld y:%d j:%d share:%d\n", nrThread, y, maxJ, myShare);
-
-    int time = 0;
+    int t = 0;
 #pragma omp parallel
     {
+        int time = 0;
         int myShare = maxJobs / omp_get_num_threads();
         int t = omp_get_thread_num();
         int x = 0, machine, max = 0;
@@ -361,24 +373,29 @@ int JobShop()
 
         int job = y;
 
+        int r = 0;
+
         if (t == omp_get_num_threads() - 1)
         {
             maxJ = maxJobs;
         }
 
-        printf("thread:%d y:%d maxJ:%d\n", t, y, maxJ);
+        // printf("thread:%d y:%d maxJ:%d\n", t, y, maxJ);
         while (y < maxJ)
         {
-#pragma omp critical
+            if (jobSolution[job][x] == -1 && verifyPreviousOp(job, x))
             {
-                if (jobSolution[job][x] == -1 && verifyPreviousOp(job, x))
+                machine = jobM[job][x];
+                if (Machines[time][machine] == -1)
                 {
-                    machine = jobM[job][x];
-                    if (Machines[time][machine] == -1)
+                    if (max < jobTime[job][x])
+                        max = jobTime[job][x];
+#pragma omp critical
                     {
-                        if (max < jobTime[job][x])
-                            max = jobTime[job][x];
-                        InsertJob(machine, time, jobTime[job][x], job);
+                        r = InsertJob(machine, time, jobTime[job][x], job);
+                    }
+                    if (r == 1)
+                    {
                         jobSolution[job][x] = time;
 
                         if (job == maxJ - 1)
@@ -406,32 +423,34 @@ int JobShop()
                         time++;
                     }
                 }
-                else if (job == maxJ - 1)
-                {
-                    x++;
-                    job = y;
-                    if (x == maxMac)
-                    {
-                        y++;
-                        x = 0;
-                    }
-                    if (max != 0)
-                    {
-                        time = time + max;
-                        max = 0;
-                    }
-                }
                 else
                 {
-                    job++;
+                    time++;
                 }
             }
-
-            // O ciclo percorre da esquerda para a direita e simultaneamente percorre a coluna de cada operação
-            //  Confições de progressão do ciclo
+            else if (job == maxJ - 1)
+            {
+                x++;
+                job = y;
+                if (x == maxMac)
+                {
+                    y++;
+                    x = 0;
+                }
+                if (max != 0)
+                {
+                    time = time + max;
+                    max = 0;
+                }
+            }
+            else
+            {
+                job++;
+            }
         }
+        t = time;
     }
-    return time;
+    return t;
 }
 
 int VerifySolution()
@@ -444,7 +463,24 @@ int VerifySolution()
             {
                 return 1;
             }
+            int r = countMachineSlots(jobSolution[y][x], jobSolution[y][x] + jobTime[y][x], y, jobM[y][x]);
+
+            if (r == 0)
+                return 2;
+            if (r != jobTime[y][x])
+                return 3;
         }
 
     return 0;
+}
+
+int countMachineSlots(int startTime, int endTime, int jobNr, int machineNr)
+{
+    int counter = 0;
+    for (int i = startTime; i < endTime; i++)
+    {
+        if (Machines[i][machineNr] == jobNr)
+            counter++;
+    }
+    return counter;
 }
