@@ -325,8 +325,17 @@ int JobShop()
     {
         int myShare = maxJobs / omp_get_num_threads();
         int t = omp_get_thread_num();
-        int y = t * myShare, x = 0, machine, job = y, max = 0;
-        int maxJ = (t + 1) * myShare + myShare + 1;
+        int x = 0, machine, max = 0;
+
+        int y = t * myShare;
+        int maxJ = (t + 1) * myShare;
+
+        int job = y;
+
+        if (t == omp_get_num_threads() - 1)
+        {
+            maxJ = maxJobs;
+        }
 
         printf("thread:%d y:%d maxJ:%d\n", t, y, maxJ);
         while (y < maxJ)
