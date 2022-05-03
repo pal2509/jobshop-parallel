@@ -5,10 +5,11 @@
 #include <stdbool.h>
 #include <pthread.h>
 #include <omp.h>
+#define getClock() omp_get_wtime()
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 #define MAX 1000
-#define MAXTIME 10000
+#define MAXTIME 100000
 
 int maxJobs = 0;
 int maxMac = 0;
@@ -108,7 +109,9 @@ int main(int argc, char *argv[])
 
     // free(thread_handles);
 
+    double startTime = getClock();
     int time = JobShop();
+    double endTime = getClock();
 
     printf("\n\t\tSOLUÇÃO\n");
     // Escrita do resultado na consola
@@ -117,6 +120,10 @@ int main(int argc, char *argv[])
     WriteFile(fileNameO);
 
     printf("\nverify: %d\n", VerifySolution());
+    printf("Tempo de inicio: %f\n", startTime);
+    printf("Tempo de fim: %f\n", endTime);
+    printf("Tempo de execução: %f\n", (double)((endTime - startTime)));
+
     return 1;
 }
 
@@ -232,7 +239,7 @@ void ReadFile(char *fileName)
     }
 
     // buffer de leitura
-    char buffer[2048];
+    char buffer[2048 * 10];
 
     int x = 0, y = 0;
 
@@ -373,31 +380,55 @@ int JobShop()
                             max = jobTime[job][x];
                         InsertJob(machine, time, jobTime[job][x], job);
                         jobSolution[job][x] = time;
+
+                        if (job == maxJ - 1)
+                        {
+                            x++;
+                            job = y;
+                            if (x == maxMac)
+                            {
+                                y++;
+                                x = 0;
+                            }
+                            if (max != 0)
+                            {
+                                time = time + max;
+                                max = 0;
+                            }
+                        }
+                        else
+                        {
+                            job++;
+                        }
                     }
+                    else
+                    {
+                        time++;
+                    }
+                }
+                else if (job == maxJ - 1)
+                {
+                    x++;
+                    job = y;
+                    if (x == maxMac)
+                    {
+                        y++;
+                        x = 0;
+                    }
+                    if (max != 0)
+                    {
+                        time = time + max;
+                        max = 0;
+                    }
+                }
+                else
+                {
+                    job++;
                 }
             }
 
             // O ciclo percorre da esquerda para a direita e simultaneamente percorre a coluna de cada operação
             //  Confições de progressão do ciclo
-            if (job == maxJ - 1)
-            {
-                x++;
-                job = y;
-                if (x == maxMac)
-                {
-                    y++;
-                    x = 0;
-                }
-                if (max != 0)
-                {
-                    time = time + max;
-                    max = 0;
-                }
-            }
-            else
-            {
-                job++;
-            }
         }
     }
     return time;

@@ -85,7 +85,10 @@ int main(int argc, char *argv[])
             Machines[i][j] = -1;
         }
 
+    double startTime = getClock();
     int time = JobShop();
+
+    double endTime = getClock();
 
     printf("\n\t\tSOLUÇÃO\n");
     // Escrita do resultado na consola
@@ -95,7 +98,9 @@ int main(int argc, char *argv[])
     WriteFile(fileNameO);
 
     printf("\nverify: %d\n", VerifySolution());
-
+    printf("Tempo de inicio: %f\n", startTime);
+    printf("Tempo de fim: %f\n", endTime);
+    printf("Tempo de execução: %f\n", (double)((endTime - startTime)));
     return 1;
 }
 
@@ -314,7 +319,6 @@ void WriteFile(char *filename)
 
 int JobShop()
 {
-    double startTime = getClock();
 
     int y = 0, x = 0, max = 0, machine, job = 0, time = 0;
 
@@ -354,10 +358,6 @@ int JobShop()
         }
     }
 
-    double endTime = getClock();
-    printf("Tempo de inicio: %f\n", startTime);
-    printf("Tempo de fim: %f\n", endTime);
-    printf("Tempo de execução: %f", (double)((endTime - startTime)));
     return time;
 }
 
