@@ -447,7 +447,6 @@ int JobShop()
                 job++;
             }
         }
-        printf("time:%d\n", time);
         TotalTime = time;
     }
     return 0;
