@@ -109,12 +109,6 @@ int main(int argc, char *argv[])
     printf("\nverify: %d\n", VerifySolution());
     printf("Média de tempo 10x: %f\n", sum / 10);
 
-    // printMachineArray(70);
-
-    // printf("Tempo de inicio: %f\n", startTime);
-    // printf("Tempo de fim: %f\n", endTime);
-    // printf("Tempo de execução: %f\n", (double)((endTime - startTime)));
-
     return 1;
 }
 
@@ -353,13 +347,6 @@ void WriteFile(char *filename)
 }
 int JobShop()
 {
-    // long nrThread = (long)rank;
-    // int myShare = maxJobs / thread_count;
-    // int y = 0, x = 0, max = 0, machine, job = y, time = 0;
-    // int maxJ = nrThread * myShare + myShare;
-
-    // printf("t:%ld y:%d j:%d share:%d\n", nrThread, y, maxJ, myShare);
-
 #pragma omp parallel
     {
         int time = 0;
