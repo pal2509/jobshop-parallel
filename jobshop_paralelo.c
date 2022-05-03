@@ -345,70 +345,108 @@ void WriteFile(char *filename)
         fprintf(fpInput, "\n");
     }
 }
+
+// A ideia principal do algoritmo é percorrer o o array da linha a linha da esquerda para direita
+// e por cada avanço para a direita a coluna respetiva é percorrida de cima para baixo
+
 int JobShop()
 {
+    // Inicio do paralelismo
 #pragma omp parallel
     {
+        // Contador de tempo para cada thread
         int time = 0;
+        // Quantos jobs cada thread vai ter
         int myShare = maxJobs / omp_get_num_threads();
+        // Numero da thread
         int t = omp_get_thread_num();
+        // Variáveis locais - x representa a operação, machine é o nr da maquina,
+        // max é para guardar o tempo maximo da tarefa com maior tempo naquela iteração
         int x = 0, machine, max = 0;
-
+        // Calculo do job de inicio de cada thread
         int y = t * myShare;
+        // Calculo do job de fim de cada thread
         int maxJ = (t + 1) * myShare;
 
+        // job guarda o numero do job
         int job = y;
 
+        // variável auxiliar
         int r = 0;
-
+        // Verifica se a thread é a ultima
+        // se sim esta fica com os jobs que sobrarem
         if (t == omp_get_num_threads() - 1)
         {
             maxJ = maxJobs;
         }
 
         // printf("thread:%d y:%d maxJ:%d\n", t, y, maxJ);
+
+        // Ciclo para percorrer toda a matriz da solução
         while (y < maxJ)
         {
+            // Verifica se já existe uma solução na posição atual e na anterior
             if (jobSolution[job][x] == -1 && verifyPreviousOp(job, x))
             {
+                // Atribui o numero da maquina a usar
                 machine = jobM[job][x];
+                // Verifica se a maquina está livre
                 if (Machines[time][machine] == -1)
                 {
+                    // Guarda o máximo de tempo
                     if (max < jobTime[job][x])
                         max = jobTime[job][x];
 #pragma omp critical
                     {
+                        // secção critica em que as threads escrevem na matriz global das maquinas
+                        // esta função vai verificar se a maquina que o job tem de usar está livre neste instante de tempo
+                        // e nos instantes seguintes que o job demora
+                        // se o houver espaço para o job, a função insere o numero do job na matriz em cada instante de tempo necessário
+                        // no fim retorna 1
+                        // Se não for possivel inserir neste tempo o job retorna 0
+                        // E assim avança-se o instante de tempo
                         r = InsertJob(machine, time, jobTime[job][x], job);
                     }
                     if (r == 1)
                     {
+                        // Guarda o tempo inicio na solução
                         jobSolution[job][x] = time;
 
+                        // Quando o job chega ao maximo é incrementado
+                        // a operação, atribuido ao job o y
                         if (job == maxJ - 1)
                         {
                             x++;
                             job = y;
+                            // Quando se chega o fim da linha
+                            // Passa-se para a linha seguinta (y++) e volta-se á coluna inicial (x = 0)
                             if (x == maxMac)
                             {
                                 y++;
                                 x = 0;
                             }
+                            // Se o maximo for diferente de 0 é incrementado no tempo
                             if (max != 0)
                             {
                                 time = time + max;
                                 max = 0;
                             }
                         }
+                        // se não estivermos no ultimo job
+                        // incrementa-se o job
+                        // fazendo o percorrimento da coluna na vertical
                         else
                         {
                             job++;
                         }
                     }
+                    // Senão for encontrado espaço para inserir o job o tempo é incrementado
                     else
                     {
                         time++;
                     }
                 }
+                // Se a maquina estiver ocupada para inserir o job o tempo é incrementado
                 else
                 {
                     time++;
