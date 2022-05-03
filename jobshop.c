@@ -4,10 +4,15 @@
 #include <string.h>
 #include <stdbool.h>
 #include <pthread.h>
+#include <time.h>
+#include <omp.h>
+#define getClock() omp_get_wtime()
+
+//#define getClock() ((double)clock() / CLOCKS_PER_SEC)
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 #define MAX 1000
-#define MAXTIME 10000
+#define MAXTIME 100000
 
 int maxJobs = 0;
 int maxMac = 0;
@@ -84,7 +89,9 @@ int main(int argc, char *argv[])
 
     printf("\n\t\tSOLUÇÃO\n");
     // Escrita do resultado na consola
+
     PrintJobs(maxJobs, maxMac, time);
+
     WriteFile(fileNameO);
 
     printf("\nverify: %d\n", VerifySolution());
@@ -203,7 +210,7 @@ void ReadFile(char *fileName)
     }
 
     // buffer de leitura
-    char buffer[2048];
+    char buffer[2048 * 10];
 
     int x = 0, y = 0;
 
@@ -221,8 +228,8 @@ void ReadFile(char *fileName)
     //  Função que parte uma string segundo um separador
     char *ptr = strtok(buffer, delim);
 
-    int i = 0, nr = 0, job = 0, time = 0, man = 0;
-
+    int nr = 0, job = 0, time = 0, man = 0;
+    long i = 0;
     // Verificar
     //  ptr = strtok(NULL, delim);
 
@@ -307,6 +314,8 @@ void WriteFile(char *filename)
 
 int JobShop()
 {
+    double startTime = getClock();
+
     int y = 0, x = 0, max = 0, machine, job = 0, time = 0;
 
     while (y < maxJobs)
@@ -345,6 +354,10 @@ int JobShop()
         }
     }
 
+    double endTime = getClock();
+    printf("Tempo de inicio: %f\n", startTime);
+    printf("Tempo de fim: %f\n", endTime);
+    printf("Tempo de execução: %f", (double)((endTime - startTime)));
     return time;
 }
 
