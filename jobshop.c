@@ -37,6 +37,8 @@ int InsertJob(int machine, int time, int jobDuration, int jobNr);
 bool verifyPreviousOp(int job, int op);
 int JobShop();
 int VerifySolution();
+void printMachineArray(int time);
+int countMachineSlots(int startTime, int endTime, int jobNr, int machineNr);
 
 int main(int argc, char *argv[])
 {
@@ -371,7 +373,24 @@ int VerifySolution()
             {
                 return 1;
             }
+            int r = countMachineSlots(jobSolution[y][x], jobSolution[y][x] + jobTime[y][x], y, jobM[y][x]);
+
+            if (r == 0)
+                return 2;
+            if (r != jobTime[y][x])
+                return 3;
         }
 
     return 0;
+}
+
+int countMachineSlots(int startTime, int endTime, int jobNr, int machineNr)
+{
+    int counter = 0;
+    for (int i = startTime; i < endTime; i++)
+    {
+        if (Machines[i][machineNr] == jobNr)
+            counter++;
+    }
+    return counter;
 }
