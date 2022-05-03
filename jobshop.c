@@ -27,6 +27,7 @@ int Machines[MAXTIME][MAX];
 
 void PrintJobs(int y, int x, int totalTime);
 void ReadFile(char *fileName);
+void WriteFile(char *filename);
 int InsertJob(int machine, int time, int jobDuration, int jobNr);
 bool verifyPreviousOp(int job, int op);
 int JobShop();
@@ -84,6 +85,7 @@ int main(int argc, char *argv[])
     printf("\n\t\tSOLUÇÃO\n");
     // Escrita do resultado na consola
     PrintJobs(maxJobs, maxMac, time);
+    WriteFile(fileNameO);
 
     printf("\nverify: %d\n", VerifySolution());
 
@@ -279,9 +281,28 @@ void ReadFile(char *fileName)
 }
 
 // Função para escrita da solução num ficheiro
-void WriteFile(char *filename, int maxJobs, int maxMac, int jobSolution[maxJobs][maxMac])
+void WriteFile(char *filename)
 {
     // TODO file writing
+
+    // Abertura do ficheiro para leitura
+    FILE *fpInput = fopen(filename, "w+");
+    if (!fpInput)
+    {
+        perror("fopen");
+        return;
+    }
+
+    fprintf(fpInput, "%d  %d\n", maxJobs, maxMac);
+
+    for (int y = 0; y < maxJobs; y++)
+    {
+        for (int x = 0; x < maxMac; x++)
+        {
+            fprintf(fpInput, "%d  ", jobSolution[y][x]);
+        }
+        fprintf(fpInput, "\n");
+    }
 }
 
 int JobShop()
