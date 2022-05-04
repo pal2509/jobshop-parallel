@@ -100,9 +100,11 @@ int main(int argc, char *argv[])
         sum = sum + (endTime - startTime);
     }
 
-    printf("\n\t\tSOLUÇÃO\n");
-    //  Escrita do resultado na consola
-    PrintJobs(maxJobs, maxMac, TotalTime);
+    // printf("\n\t\tSOLUÇÃO\n");
+    //   Escrita do resultado na consola
+    // PrintJobs(maxJobs, maxMac, TotalTime);
+
+    printf("Tempo total para completar todos os processos: %d unidades de tempo\n", TotalTime);
 
     WriteFile(fileNameO);
 
@@ -306,16 +308,16 @@ void ReadFile(char *fileName)
     // printf("\n");
     // printf("%d %d\n", maxJobs, maxMac);
 
-    for (int i = 0; i < maxJobs; i++)
-    {
-        printf("job:%d ", i);
-        for (int j = 0; j < maxMac; j++)
-        {
-            printf("M:%d ", jobM[i][j]);
-            printf("T:%d ", jobTime[i][j]);
-        }
-        printf("\n");
-    }
+    // for (int i = 0; i < maxJobs; i++)
+    // {
+    //     printf("job:%d ", i);
+    //     for (int j = 0; j < maxMac; j++)
+    //     {
+    //         printf("M:%d ", jobM[i][j]);
+    //         printf("T:%d ", jobTime[i][j]);
+    //     }
+    //     printf("\n");
+    // }
 
     // Fechar o ficheiro
     fclose(fpInput);

@@ -92,14 +92,15 @@ int main(int argc, char *argv[])
 
     double endTime = getClock();
 
-    printf("\n\t\tSOLUÇÃO\n");
-    // Escrita do resultado na consola
+    // printf("\n\t\tSOLUÇÃO\n");
+    // // Escrita do resultado na consola
+    // PrintJobs(maxJobs, maxMac, time);
 
-    PrintJobs(maxJobs, maxMac, time);
+    printf("Tempo total para completar todos os processos: %d unidades de tempo\n", time);
 
     WriteFile(fileNameO);
 
-    printf("\nverify: %d\n", VerifySolution());
+    printf("Verificação da solução: %s\n", VerifySolution() == 0 ? "Correta" : "Errada");
     printf("Tempo de inicio: %f\n", startTime);
     printf("Tempo de fim: %f\n", endTime);
     printf("Tempo de execução: %f\n", (double)((endTime - startTime)));
@@ -279,16 +280,16 @@ void ReadFile(char *fileName)
     // printf("\n");
     // printf("%d %d\n", maxJobs, maxMac);
 
-    for (int i = 0; i < maxJobs; i++)
-    {
-        printf("job:%d ", i);
-        for (int j = 0; j < maxMac; j++)
-        {
-            printf("M:%d ", jobM[i][j]);
-            printf("T:%d ", jobTime[i][j]);
-        }
-        printf("\n");
-    }
+    // for (int i = 0; i < maxJobs; i++)
+    // {
+    //     printf("job:%d ", i);
+    //     for (int j = 0; j < maxMac; j++)
+    //     {
+    //         printf("M:%d ", jobM[i][j]);
+    //         printf("T:%d ", jobTime[i][j]);
+    //     }
+    //     printf("\n");
+    // }
 
     // Fechar o ficheiro
     fclose(fpInput);
