@@ -99,9 +99,9 @@ int main(int argc, char *argv[])
     WriteFile(fileNameO);
 
     printf("Verificação da solução: %s\n", VerifySolution() == 0 ? "Correta" : "Errada");
-    printf("Tempo de inicio: %ld\n", startTime);
-    printf("Tempo de fim: %ld\n", endTime);
-    printf("Tempo de execução: %f\n", (endTime - startTime) / CLOCKS_PER_SEC);
+    printf("Tempo de inicio: %lf\n", (double)startTime / CLOCKS_PER_SEC);
+    printf("Tempo de fim: %lf\n", (double)endTime / CLOCKS_PER_SEC);
+    printf("Tempo de execução: %lf\n", (double)(endTime - startTime) / CLOCKS_PER_SEC);
     return 1;
 }
 
