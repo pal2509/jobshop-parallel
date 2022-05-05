@@ -77,28 +77,28 @@ int main(int argc, char *argv[])
     //      }
     //  }
 
-    double sum;
-    for (int i = 0; i < 10; i++)
-    {
+    double sum = 0;
+    // for (int i = 0; i < 10; i++)
+    // {
 
-        // Por os arrays com os valores a -1
-        for (int i = 0; i < MAX; i++)
-            for (int j = 0; j < MAX; j++)
-            {
-                jobSolution[i][j] = -1;
-            }
+    // Por os arrays com os valores a -1
+    for (int i = 0; i < MAX; i++)
+        for (int j = 0; j < MAX; j++)
+        {
+            jobSolution[i][j] = -1;
+        }
 
-        for (int i = 0; i < MAXTIME; i++)
-            for (int j = 0; j < MAX; j++)
-            {
-                Machines[i][j] = -1;
-            }
+    for (int i = 0; i < MAXTIME; i++)
+        for (int j = 0; j < MAX; j++)
+        {
+            Machines[i][j] = -1;
+        }
 
-        double startTime = getClock();
-        JobShop();
-        double endTime = getClock();
-        sum = sum + (endTime - startTime);
-    }
+    double startTime = getClock();
+    JobShop();
+    double endTime = getClock();
+    sum = sum + (endTime - startTime);
+    //}
 
     // printf("\n\t\tSOLUÇÃO\n");
     //   Escrita do resultado na consola
@@ -108,8 +108,10 @@ int main(int argc, char *argv[])
 
     WriteFile(fileNameO);
 
-    printf("\nverify: %d\n", VerifySolution());
-    printf("Média de tempo 10x: %f\n", sum / 10);
+    printf("Verificação da solução: %s\n", VerifySolution() == 0 ? "Correta" : "Errada");
+    printf("Tempo de inicio: %f\n", startTime);
+    printf("Tempo de fim: %f\n", endTime);
+    printf("Tempo de execução: %f\n", (double)((endTime - startTime)));
 
     return 1;
 }
@@ -474,7 +476,11 @@ int JobShop()
                 job++;
             }
         }
-        TotalTime = time;
+
+        if (t == omp_get_num_threads() - 1)
+        {
+            TotalTime = time;
+        }
     }
     return 0;
 }

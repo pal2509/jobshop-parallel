@@ -3,10 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <pthread.h>
 #include <time.h>
-#include <omp.h>
-#define getClock() omp_get_wtime()
+
+//#define getClock() ((double)clock() / CLOCKS_PER_SEC)
 
 //#define getClock() ((double)clock() / CLOCKS_PER_SEC)
 
@@ -87,10 +86,9 @@ int main(int argc, char *argv[])
             Machines[i][j] = -1;
         }
 
-    double startTime = getClock();
+    clock_t startTime = clock();
     int time = JobShop();
-
-    double endTime = getClock();
+    clock_t endTime = clock();
 
     // printf("\n\t\tSOLUÇÃO\n");
     // // Escrita do resultado na consola
@@ -101,9 +99,9 @@ int main(int argc, char *argv[])
     WriteFile(fileNameO);
 
     printf("Verificação da solução: %s\n", VerifySolution() == 0 ? "Correta" : "Errada");
-    printf("Tempo de inicio: %f\n", startTime);
-    printf("Tempo de fim: %f\n", endTime);
-    printf("Tempo de execução: %f\n", (double)((endTime - startTime)));
+    printf("Tempo de inicio: %ld\n", startTime);
+    printf("Tempo de fim: %ld\n", endTime);
+    printf("Tempo de execução: %f\n", (endTime - startTime) / CLOCKS_PER_SEC);
     return 1;
 }
 
