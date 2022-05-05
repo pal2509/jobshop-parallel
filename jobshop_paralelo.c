@@ -134,6 +134,9 @@ int InsertJob(int machine, int time, int jobDuration, int jobNr)
     // printf("insert:%d %d ", machine, jobNr);
 
     int slots = 0;
+    //Pensei em utilizar o critical so nas partes em que é mexido na matriz,
+    //mas quando cada thread entra nesta função se outra thread alterar os dados enquanto,
+    //se passa de contar as slots para a inserção na matriz, pode haver sobreposição de jobs na maquina
     for (int i = time; i < time + jobDuration; i++)
     {
         if (Machines[i][machine] == -1)

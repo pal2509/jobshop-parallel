@@ -72,24 +72,28 @@ int main(int argc, char *argv[])
     //          time += jobTime[y][x];
     //      }
     //  }
+    int time = 0;
+    double sum = 0;
+    for (int i = 0; i < 10; i++)
+    {
+        // Por os arrays com os valores a -1
+        for (int i = 0; i < MAX; i++)
+            for (int j = 0; j < MAX; j++)
+            {
+                jobSolution[i][j] = -1;
+            }
 
-    // Por os arrays com os valores a -1
-    for (int i = 0; i < MAX; i++)
-        for (int j = 0; j < MAX; j++)
-        {
-            jobSolution[i][j] = -1;
-        }
+        for (int i = 0; i < MAXTIME; i++)
+            for (int j = 0; j < MAX; j++)
+            {
+                Machines[i][j] = -1;
+            }
 
-    for (int i = 0; i < MAXTIME; i++)
-        for (int j = 0; j < MAX; j++)
-        {
-            Machines[i][j] = -1;
-        }
-
-    clock_t startTime = clock();
-    int time = JobShop();
-    clock_t endTime = clock();
-
+        double startTime = clock() / CLOCKS_PER_SEC;
+        time = JobShop();
+        double endTime = clock() / CLOCKS_PER_SEC;
+        sum = sum + (endTime - startTime);
+    }
     // printf("\n\t\tSOLUÇÃO\n");
     // // Escrita do resultado na consola
     // PrintJobs(maxJobs, maxMac, time);
@@ -99,9 +103,9 @@ int main(int argc, char *argv[])
     WriteFile(fileNameO);
 
     printf("Verificação da solução: %s\n", VerifySolution() == 0 ? "Correta" : "Errada");
-    printf("Tempo de inicio: %lf\n", (double)startTime / CLOCKS_PER_SEC);
-    printf("Tempo de fim: %lf\n", (double)endTime / CLOCKS_PER_SEC);
-    printf("Tempo de execução: %lf\n", (double)(endTime - startTime) / CLOCKS_PER_SEC);
+    // printf("Tempo de inicio: %lf\n", (double)startTime / CLOCKS_PER_SEC);
+    // printf("Tempo de fim: %lf\n", (double)endTime / CLOCKS_PER_SEC);
+    printf("Tempo de execução: %lf\n", sum / 10);
     return 1;
 }
 
