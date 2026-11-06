@@ -1,0 +1,6 @@
+# build output and run results
+jobshop
+jobshop_parallel
+jobshop_sequencial
+jobshop_worst
+out*.txt
